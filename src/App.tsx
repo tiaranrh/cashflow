@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAuthUrl, GoogleTokens, appendToSheet, createCalendarEvent, listCalendarEvents, getSheetData, batchUpdateSheet, createSpreadsheet, updateSheetRow, deleteSheetRow, getSpreadsheetMetadata } from './services/googleService';
 import { getCashflowInsights } from './services/geminiService';
-import { PlusCircle, LogOut, LayoutDashboard, Settings, PieChart, Calendar as CalendarIcon, AlertCircle, CheckCircle2, RefreshCw, Database } from 'lucide-react';
+import { PlusCircle, LogOut, LayoutDashboard, Settings, PieChart, Calendar as CalendarIcon, AlertCircle, CheckCircle2, RefreshCw, Database, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, isAfter } from 'date-fns';
 
@@ -19,6 +19,19 @@ export default function App() {
   const [spreadsheetId, setSpreadsheetId] = useState<string>(localStorage.getItem('spreadsheet_id') || '');
   const [calendarId, setCalendarId] = useState<string>(localStorage.getItem('calendar_id') || '');
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('user_email'));
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('dark_mode');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('dark_mode', JSON.stringify(darkMode));
+  }, [darkMode]);
 
   useEffect(() => {
     console.log("[APP] Mounting CashFlow Gemini...");
@@ -406,11 +419,11 @@ export default function App() {
 
   if (loading && googleTokens && spreadsheetId) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-stone-50 font-sans">
+      <div className="flex flex-col items-center justify-center h-screen bg-stone-50 dark:bg-stone-950 font-sans transition-colors duration-300">
         <div className="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg animate-pulse">
           <Database className="text-white w-8 h-8" />
         </div>
-        <div className="flex items-center gap-3 text-stone-400 font-bold tracking-widest uppercase text-xs">
+        <div className="flex items-center gap-3 text-stone-400 dark:text-stone-500 font-bold tracking-widest uppercase text-xs">
           <RefreshCw className="w-4 h-4 animate-spin" />
           Syncing with Google Sheets...
         </div>
@@ -420,20 +433,20 @@ export default function App() {
 
   if (!googleTokens) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-stone-100 font-sans p-6">
+      <div className="flex flex-col items-center justify-center h-screen bg-stone-100 dark:bg-stone-900 font-sans p-6 transition-colors duration-300">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-12 rounded-3xl shadow-xl max-w-md w-full text-center border border-stone-200"
+          className="bg-white dark:bg-stone-800 p-12 rounded-3xl shadow-xl max-w-md w-full text-center border border-stone-200 dark:border-stone-700"
         >
-          <div className="bg-emerald-500 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-emerald-200">
+          <div className="bg-emerald-500 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/20">
             <PieChart className="text-white w-8 h-8" />
           </div>
-          <h1 className="text-4xl font-bold text-stone-900 mb-4 tracking-tight">CashFlow Gemini</h1>
-          <p className="text-stone-500 mb-10 leading-relaxed">Smart personal finance tracking using Google Sheets as your database.</p>
+          <h1 className="text-4xl font-bold text-stone-900 dark:text-stone-50 mb-4 tracking-tight">CashFlow Gemini</h1>
+          <p className="text-stone-500 dark:text-stone-400 mb-10 leading-relaxed">Smart personal finance tracking using Google Sheets as your database.</p>
           <button 
             onClick={handleConnectGoogle}
-            className="w-full bg-stone-900 text-white py-4 rounded-2xl font-semibold hover:bg-stone-800 transition-all shadow-lg hover:shadow-xl active:scale-95"
+            className="w-full bg-stone-900 dark:bg-emerald-500 text-white py-4 rounded-2xl font-semibold hover:bg-stone-800 dark:hover:bg-emerald-600 transition-all shadow-lg hover:shadow-xl active:scale-95"
           >
             Connect with Google
           </button>
@@ -443,23 +456,30 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 font-sans text-stone-900 pb-24">
+    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 font-sans text-stone-900 dark:text-stone-50 pb-24 transition-colors duration-300">
       <header className="sticky top-0 z-40 glass safe-top">
-        <div className="max-w-xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-stone-900 rounded-xl flex items-center justify-center shadow-lg animate-float">
+            <div className="w-10 h-10 bg-stone-900 dark:bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg animate-float">
               <PieChart className="text-white w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-display font-bold tracking-tight">CashFlow</h1>
-              <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Gemini Powered</p>
+              <h1 className="text-2xl font-display font-bold tracking-tight dark:text-white">CashFlow</h1>
+              <p className="text-[11px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">Gemini Powered</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl transition-colors text-stone-500 dark:text-stone-400"
+              title="Toggle Theme"
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             {googleTokens && (
               <button 
                 onClick={() => setShowCostGuide(!showCostGuide)}
-                className="p-2 hover:bg-stone-100 rounded-xl transition-colors text-stone-500"
+                className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl transition-colors text-stone-500 dark:text-stone-400"
                 title="GCP Cost Guide"
               >
                 <Database className="w-5 h-5" />
@@ -467,7 +487,7 @@ export default function App() {
             )}
             <button 
               onClick={handleLogout}
-              className="p-2 hover:bg-rose-50 rounded-xl transition-colors text-stone-400 hover:text-rose-600"
+              className="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-colors text-stone-400 hover:text-rose-600 dark:hover:text-rose-400"
               title="Logout"
             >
               <LogOut className="w-5 h-5" />
@@ -476,142 +496,149 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-xl mx-auto p-6 space-y-8 safe-bottom">
-        <AnimatePresence>
-          {showCostGuide && (
+      <main className="max-w-5xl mx-auto p-6 space-y-8 md:grid md:grid-cols-12 md:gap-8 md:space-y-0 safe-bottom">
+        <div className="md:col-span-12">
+          <AnimatePresence>
+            {showCostGuide && (
+              <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="bg-stone-900 text-white p-6 rounded-3xl shadow-xl space-y-4 mb-8"
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-lg flex items-center gap-2">
+                    <Database className="w-5 h-5 text-emerald-400" /> GCP Cost Monitoring
+                  </h3>
+                  <button onClick={() => setShowCostGuide(false)} className="text-stone-400 hover:text-white">✕</button>
+                </div>
+                <div className="space-y-3 text-sm text-stone-300 leading-relaxed">
+                  <p>To monitor your personal usage costs in Google Cloud Console:</p>
+                  <ol className="list-decimal list-inside space-y-2">
+                    <li>Go to <a href="https://console.cloud.google.com/billing" target="_blank" className="text-emerald-400 underline" rel="noreferrer">GCP Billing</a></li>
+                    <li>Select your project to see real-time cost charts.</li>
+                    <li>Set up <b>Budgets &amp; Alerts</b> to get notified if spending exceeds $1.</li>
+                    <li>Check <b>API &amp; Services &gt; Dashboard</b> to monitor Gemini &amp; Sheets usage.</li>
+                  </ol>
+                  <p className="text-xs bg-stone-800 p-3 rounded-xl border border-stone-700">
+                    💡 <b>Pro Tip:</b> This app uses the Gemini Free Tier and standard Google APIs, which are typically free for personal use within limits.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {!spreadsheetId ? (
+          <div className="md:col-span-12">
             <motion.div 
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-stone-900 text-white p-6 rounded-3xl shadow-xl space-y-4"
+              className="bg-white dark:bg-stone-900 p-12 rounded-[3rem] shadow-xl border border-stone-100 dark:border-stone-800 max-w-md mx-auto"
             >
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-lg flex items-center gap-2">
-                  <Database className="w-5 h-5 text-emerald-400" /> GCP Cost Monitoring
-                </h3>
-                <button onClick={() => setShowCostGuide(false)} className="text-stone-400 hover:text-white">✕</button>
+              <div className="w-20 h-20 bg-emerald-500 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 shadow-lg">
+                <Database className="text-white w-10 h-10" />
               </div>
-              <div className="space-y-3 text-sm text-stone-300 leading-relaxed">
-                <p>To monitor your personal usage costs in Google Cloud Console:</p>
-                <ol className="list-decimal list-inside space-y-2">
-                  <li>Go to <a href="https://console.cloud.google.com/billing" target="_blank" className="text-emerald-400 underline">GCP Billing</a></li>
-                  <li>Select your project to see real-time cost charts.</li>
-                  <li>Set up <b>Budgets &amp; Alerts</b> to get notified if spending exceeds $1.</li>
-                  <li>Check <b>API &amp; Services &gt; Dashboard</b> to monitor Gemini &amp; Sheets usage.</li>
-                </ol>
-                <p className="text-xs bg-stone-800 p-3 rounded-xl border border-stone-700">
-                  💡 <b>Pro Tip:</b> This app uses the Gemini Free Tier and standard Google APIs, which are typically free for personal use within limits.
-                </p>
+              <h2 className="text-3xl font-bold mb-4 tracking-tight text-center dark:text-white">Setup Spreadsheet</h2>
+              <p className="text-stone-500 dark:text-stone-400 mb-8 text-center leading-relaxed">
+                We need a Google Spreadsheet to store your transactions.
+              </p>
+              
+              <div className="space-y-6">
+                <button 
+                  onClick={handleCreateSpreadsheet}
+                  disabled={setupLoading}
+                  className="w-full bg-emerald-500 text-white py-4 rounded-2xl font-bold hover:bg-emerald-600 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {setupLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <PlusCircle className="w-5 h-5" />}
+                  Create New Spreadsheet
+                </button>
+
+                <div className="relative py-4">
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-stone-200 dark:border-stone-800"></span></div>
+                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-white dark:bg-stone-900 px-2 text-stone-400 font-bold tracking-widest">Or connect existing</span></div>
+                </div>
+
+                <form onSubmit={handleConnectExistingSpreadsheet} className="space-y-3">
+                  <input 
+                    name="spreadsheetId"
+                    placeholder="Paste Spreadsheet ID"
+                    className="w-full bg-stone-50 dark:bg-stone-800 border-none rounded-xl p-4 font-medium focus:ring-2 focus:ring-stone-900 dark:focus:ring-emerald-500 transition-all dark:text-white"
+                    required
+                  />
+                  <button 
+                    type="submit"
+                    className="w-full bg-stone-900 dark:bg-emerald-500 text-white py-4 rounded-xl font-bold hover:bg-stone-800 dark:hover:bg-emerald-600 transition-all active:scale-95"
+                  >
+                    Connect ID
+                  </button>
+                </form>
               </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-        {!spreadsheetId ? (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white p-12 rounded-[3rem] shadow-xl border border-stone-100 max-w-md mx-auto"
-          >
-            <div className="w-20 h-20 bg-emerald-500 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 shadow-lg">
-              <Database className="text-white w-10 h-10" />
-            </div>
-            <h2 className="text-3xl font-bold mb-4 tracking-tight text-center">Setup Spreadsheet</h2>
-            <p className="text-stone-500 mb-8 text-center leading-relaxed">
-              We need a Google Spreadsheet to store your transactions.
-            </p>
-            
-            <div className="space-y-6">
-              <button 
-                onClick={handleCreateSpreadsheet}
-                disabled={setupLoading}
-                className="w-full bg-emerald-500 text-white py-4 rounded-2xl font-bold hover:bg-emerald-600 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {setupLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <PlusCircle className="w-5 h-5" />}
-                Create New Spreadsheet
-              </button>
-
-              <div className="relative py-4">
-                <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-stone-200"></span></div>
-                <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-stone-400 font-bold tracking-widest">Or connect existing</span></div>
-              </div>
-
-              <form onSubmit={handleConnectExistingSpreadsheet} className="space-y-3">
-                <input 
-                  name="spreadsheetId"
-                  placeholder="Paste Spreadsheet ID"
-                  className="w-full bg-stone-50 border-none rounded-xl p-4 font-medium focus:ring-2 focus:ring-stone-900 transition-all"
-                  required
-                />
-                <button 
-                  type="submit"
-                  className="w-full bg-stone-900 text-white py-4 rounded-xl font-bold hover:bg-stone-800 transition-all active:scale-95"
-                >
-                  Connect ID
-                </button>
-              </form>
-            </div>
-          </motion.div>
+          </div>
         ) : (
           <>
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-stone-900 text-white p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden"
-            >
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-2">
-                  <p className="text-stone-400 text-sm font-medium uppercase tracking-widest">Total Balance (Last 6 Months)</p>
-                  <button onClick={fetchTransactions} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                    <RefreshCw className={`w-4 h-4 text-stone-400 ${loading ? 'animate-spin' : ''}`} />
-                  </button>
-                </div>
-                <h2 className="text-6xl font-light tracking-tighter mb-6">
-                  Rp{totalBalance.toLocaleString('id-ID', { minimumFractionDigits: 0 })}
-                </h2>
-                <div className="flex flex-wrap gap-4">
-                  <button 
-                    onClick={() => {
-                      setEditingTransaction(null);
-                      setShowForm(true);
-                    }}
-                    className="bg-white text-stone-900 px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-stone-100 transition-all active:scale-95"
-                  >
-                    <PlusCircle className="w-5 h-5" /> Add Transaction
-                  </button>
-                </div>
-              </div>
-              <div className="absolute top-[-20%] right-[-10%] w-80 h-80 bg-emerald-500/20 blur-[100px] rounded-full" />
-            </motion.div>
-
-            <AnimatePresence>
-              {insight && (
-                <motion.div 
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="bg-emerald-50 border border-emerald-100 p-6 rounded-3xl relative overflow-hidden"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="bg-emerald-500 p-2 rounded-xl mt-1">
-                      <CheckCircle2 className="text-white w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-emerald-900 mb-1">Gemini Monthly Insight</h3>
-                      <p className="text-emerald-800 leading-relaxed">{insight}</p>
-                    </div>
+            <div className="md:col-span-7 space-y-8">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-stone-900 dark:bg-emerald-950 text-white p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden h-full min-h-[300px] flex flex-col justify-center"
+              >
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="text-stone-400 dark:text-emerald-300 text-base font-medium uppercase tracking-widest">Total Balance (Last 6 Months)</p>
+                    <button onClick={fetchTransactions} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                      <RefreshCw className={`w-4 h-4 text-stone-400 ${loading ? 'animate-spin' : ''}`} />
+                    </button>
                   </div>
-                  {notifying && (
-                    <div className="mt-4 flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-widest">
-                      <CalendarIcon className="w-4 h-4" /> Syncing to Google Calendar...
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <h2 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tighter mb-6 dark:text-white">
+                    Rp{totalBalance.toLocaleString('id-ID', { minimumFractionDigits: 0 })}
+                  </h2>
+                  <div className="flex flex-wrap gap-4">
+                    <button 
+                      onClick={() => {
+                        setEditingTransaction(null);
+                        setShowForm(true);
+                      }}
+                      className="bg-white dark:bg-emerald-500 text-stone-900 dark:text-white px-8 py-4 rounded-full font-bold flex items-center gap-2 hover:bg-stone-100 dark:hover:bg-emerald-600 transition-all active:scale-95 shadow-lg"
+                    >
+                      <PlusCircle className="w-6 h-6" /> Add Transaction
+                    </button>
+                  </div>
+                </div>
+                <div className="absolute top-[-20%] right-[-10%] w-80 h-80 bg-emerald-500/20 blur-[100px] rounded-full" />
+              </motion.div>
 
-            <div className="space-y-4">
+              <AnimatePresence>
+                {insight && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/30 p-6 rounded-3xl relative overflow-hidden"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="bg-emerald-500 p-2 rounded-xl mt-1">
+                        <CheckCircle2 className="text-white w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-xl text-emerald-900 dark:text-emerald-400 mb-1">Gemini Monthly Insight</h3>
+                        <p className="text-emerald-800 dark:text-emerald-300 text-base leading-relaxed">{insight}</p>
+                      </div>
+                    </div>
+                    {notifying && (
+                      <div className="mt-4 flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
+                        <CalendarIcon className="w-4 h-4" /> Syncing to Google Calendar...
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <div className="md:col-span-5 space-y-4">
               <div className="flex items-center justify-between px-2">
-                <h3 className="font-bold text-lg">Recent Activity (6-Month History)</h3>
+                <h3 className="font-bold text-xl dark:text-white">Recent Activity</h3>
                 <span className="text-xs font-bold text-stone-400 uppercase tracking-widest">{transactions.length} Records</span>
               </div>
               <div className="grid gap-3">
@@ -619,46 +646,46 @@ export default function App() {
                   <motion.div 
                     layout
                     key={tx.rowIndex}
-                    className="bg-white p-4 rounded-2xl border border-stone-200 flex items-center justify-between hover:border-stone-300 transition-colors group"
+                    className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 flex items-center justify-between hover:border-stone-300 dark:hover:border-stone-700 transition-colors group"
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${tx.type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-                        {tx.type === 'income' ? <PlusCircle className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${tx.type === 'income' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400'}`}>
+                        {tx.type === 'income' ? <PlusCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
                       </div>
                       <div>
-                        <p className="font-bold text-stone-900">{tx.category || 'Uncategorized'}</p>
-                        <p className="text-xs text-stone-400 font-medium">{format(new Date(tx.date), 'MMM dd, yyyy • HH:mm')}</p>
+                        <p className="font-bold text-base text-stone-900 dark:text-white truncate max-w-[120px]">{tx.category || 'Uncategorized'}</p>
+                        <p className="text-xs text-stone-400 dark:text-stone-500 font-medium">{format(new Date(tx.date), 'MMM dd, yyyy')}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <p className={`font-bold text-lg ${tx.type === 'income' ? 'text-emerald-600' : 'text-stone-900'}`}>
+                        <p className={`font-bold text-lg ${tx.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-stone-900 dark:text-white'}`}>
                           {tx.type === 'income' ? '+' : '-'}Rp{tx.amount.toLocaleString('id-ID')}
                         </p>
-                        <p className="text-xs text-stone-400 italic">{tx.description}</p>
+                        <p className="text-xs text-stone-400 dark:text-stone-500 italic truncate max-w-[80px]">{tx.description}</p>
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={() => handleEditClick(tx)}
-                          className="p-2 hover:bg-stone-100 rounded-lg text-stone-400 hover:text-stone-900 transition-colors"
+                          className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg text-stone-400 hover:text-stone-900 dark:hover:text-white transition-colors"
                           title="Edit"
                         >
-                          <Settings className="w-4 h-4" />
+                          <Settings className="w-3.5 h-3.5" />
                         </button>
                         <button 
                           onClick={() => handleDeleteTransaction(tx.rowIndex)}
-                          className="p-2 hover:bg-rose-50 rounded-lg text-stone-400 hover:text-rose-600 transition-colors"
+                          className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg text-stone-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
                           title="Delete"
                         >
-                          <LogOut className="w-4 h-4 rotate-90" />
+                          <LogOut className="w-3.5 h-3.5 rotate-90" />
                         </button>
                       </div>
                     </div>
                   </motion.div>
                 ))}
                 {transactions.length === 0 && !loading && (
-                  <div className="text-center py-20 bg-stone-100/50 rounded-3xl border-2 border-dashed border-stone-200">
-                    <p className="text-stone-400 font-medium">No transactions found in the last 6 months.</p>
+                  <div className="text-center py-20 bg-stone-100/50 dark:bg-stone-900/50 rounded-3xl border-2 border-dashed border-stone-200 dark:border-stone-800">
+                    <p className="text-stone-400 dark:text-stone-500 font-medium">No transactions found.</p>
                   </div>
                 )}
               </div>
@@ -681,22 +708,22 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl relative z-10 border border-stone-100"
+              className="bg-white dark:bg-stone-900 w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl relative z-10 border border-stone-100 dark:border-stone-800"
             >
-              <h3 className="text-2xl font-bold mb-6 tracking-tight">{editingTransaction ? 'Edit Transaction' : 'New Transaction'}</h3>
+              <h3 className="text-3xl font-bold mb-6 tracking-tight dark:text-white">{editingTransaction ? 'Edit Transaction' : 'New Transaction'}</h3>
               <form onSubmit={handleAddTransaction} className="space-y-5">
                 <div className="grid grid-cols-2 gap-3">
                   <label className="relative">
                     <input type="radio" name="type" value="expense" defaultChecked={!editingTransaction || editingTransaction.type === 'expense'} className="peer sr-only" />
-                    <div className="p-4 text-center rounded-2xl border-2 border-stone-100 peer-checked:border-stone-900 peer-checked:bg-stone-900 peer-checked:text-white cursor-pointer font-bold transition-all">Expense</div>
+                    <div className="p-4 text-center rounded-2xl border-2 border-stone-100 dark:border-stone-800 peer-checked:border-stone-900 dark:peer-checked:border-white peer-checked:bg-stone-900 dark:peer-checked:bg-white peer-checked:text-white dark:peer-checked:text-stone-900 cursor-pointer font-bold transition-all">Expense</div>
                   </label>
                   <label className="relative">
                     <input type="radio" name="type" value="income" defaultChecked={editingTransaction?.type === 'income'} className="peer sr-only" />
-                    <div className="p-4 text-center rounded-2xl border-2 border-stone-100 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 peer-checked:text-white cursor-pointer font-bold transition-all">Income</div>
+                    <div className="p-4 text-center rounded-2xl border-2 border-stone-100 dark:border-stone-800 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 peer-checked:text-white cursor-pointer font-bold transition-all">Income</div>
                   </label>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 block">Amount</label>
+                  <label className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-2 block">Amount</label>
                   <input 
                     required 
                     name="amount" 
@@ -704,30 +731,30 @@ export default function App() {
                     step="0.01"
                     placeholder="0.00"
                     defaultValue={editingTransaction?.amount || ''}
-                    className="w-full bg-stone-50 border-none rounded-2xl p-4 text-2xl font-bold focus:ring-2 focus:ring-stone-900 transition-all"
+                    className="w-full bg-stone-50 dark:bg-stone-800 border-none rounded-2xl p-4 text-3xl font-bold focus:ring-2 focus:ring-stone-900 dark:focus:ring-emerald-500 transition-all dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 block">Category</label>
+                  <label className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-2 block">Category</label>
                   <input 
                     name="category" 
                     placeholder="e.g. Food, Rent, Salary"
                     defaultValue={editingTransaction?.category || ''}
-                    className="w-full bg-stone-50 border-none rounded-2xl p-4 font-medium focus:ring-2 focus:ring-stone-900 transition-all"
+                    className="w-full bg-stone-50 dark:bg-stone-800 border-none rounded-2xl p-4 text-base font-medium focus:ring-2 focus:ring-stone-900 dark:focus:ring-emerald-500 transition-all dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 block">Description</label>
+                  <label className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-2 block">Description</label>
                   <textarea 
                     name="description" 
                     placeholder="What was this for?"
                     defaultValue={editingTransaction?.description || ''}
-                    className="w-full bg-stone-50 border-none rounded-2xl p-4 font-medium focus:ring-2 focus:ring-stone-900 transition-all h-24 resize-none"
+                    className="w-full bg-stone-50 dark:bg-stone-800 border-none rounded-2xl p-4 text-base font-medium focus:ring-2 focus:ring-stone-900 dark:focus:ring-emerald-500 transition-all h-24 resize-none dark:text-white"
                   />
                 </div>
                 <button 
                   type="submit"
-                  className="w-full bg-stone-900 text-white py-4 rounded-2xl font-bold hover:bg-stone-800 transition-all shadow-lg active:scale-95"
+                  className="w-full bg-stone-900 dark:bg-emerald-500 text-white py-4 rounded-2xl font-bold hover:bg-stone-800 dark:hover:bg-emerald-600 transition-all shadow-lg active:scale-95"
                 >
                   {editingTransaction ? 'Update Transaction' : 'Save Transaction'}
                 </button>
@@ -747,7 +774,7 @@ export default function App() {
             setEditingTransaction(null);
             setShowForm(true);
           }}
-          className="fixed bottom-8 right-8 w-16 h-16 bg-stone-900 text-white rounded-full shadow-2xl flex items-center justify-center z-40 sm:hidden"
+          className="fixed bottom-8 right-8 w-16 h-16 bg-stone-900 dark:bg-emerald-500 text-white rounded-full shadow-2xl flex items-center justify-center z-40 sm:hidden"
         >
           <PlusCircle className="w-8 h-8" />
         </motion.button>

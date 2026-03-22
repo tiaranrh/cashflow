@@ -5,9 +5,12 @@
   --font-display: "Outfit", sans-serif;
 }
 
+@variant dark (&:where(.dark, .dark *));
+
 @layer base {
   body {
-    @apply bg-stone-50 text-stone-900 antialiased selection:bg-emerald-100 selection:text-emerald-900;
+    @apply bg-stone-50 text-stone-900 antialiased selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-300;
+    @apply dark:bg-stone-950 dark:text-stone-50 dark:selection:bg-emerald-900 dark:selection:text-emerald-100;
     -webkit-tap-highlight-color: transparent;
   }
 }
@@ -15,6 +18,7 @@
 @layer utilities {
   .glass {
     @apply backdrop-blur-xl bg-white/80 border border-white/20;
+    @apply dark:bg-stone-900/80 dark:border-white/10;
   }
   
   .safe-bottom {

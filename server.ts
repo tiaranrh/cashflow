@@ -23,10 +23,11 @@ async function startServer() {
   });
 
   // Google OAuth configuration
+  const appUrl = process.env.APP_URL?.replace(/\/$/, "") || `http://localhost:${PORT}`;
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `${process.env.APP_URL}/auth/callback`
+    `${appUrl}/auth/callback`
   );
 
   // API Routes
