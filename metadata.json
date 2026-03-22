@@ -1,0 +1,5 @@
+{
+  "name": "CashFlow Gemini",
+  "description": "Personal cashflow app integrated with Google Sheets and Calendar, featuring Gemini-powered monthly insights.",
+  "requestFramePermissions": []
+}
